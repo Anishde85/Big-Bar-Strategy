@@ -17,7 +17,7 @@ endTime = timestamp("GMT", endYear, endMonth, endDay, 23, 59)
 ema9 = ta.ema(close, 9)
 
 // Define Entry Conditions
-candleSize = math.abs(open - close) >= 12 and math.abs(open - close) <= 16
+candleSize = math.abs(open - close) >= 13 and math.abs(open - close) <= 18
 breaksEMA = (close > ema9 and open < ema9) or (close < ema9 and open > ema9)
 shortNegligibleWick = close - low <= math.abs(open - close) / 5
 longNegligibleWick = high - close <= math.abs(open - close) / 5
