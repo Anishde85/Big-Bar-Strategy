@@ -1,0 +1,83 @@
+//@version=5
+strategy("Anish De Nifty 50 EMA Break Strategy", overlay=true, default_qty_value=100, default_qty_type=strategy.fixed)
+
+// Input fields for start and end dates
+startYear = input(2023, "Start Year")
+startMonth = input(12, "Start Month")
+startDay = input(1, "Start Day")
+endYear = input(2023, "End Year")
+endMonth = input(12, "End Month")
+endDay = input(31, "End Day")
+
+// Convert input fields to timestamp
+startTime = timestamp("GMT", startYear, startMonth, startDay, 00, 00)
+endTime = timestamp("GMT", endYear, endMonth, endDay, 23, 59)
+
+// Define the EMA
+ema9 = ta.ema(close, 9)
+
+// Define Entry Conditions
+candleSize = math.abs(open - close) >= 12 and math.abs(open - close) <= 16
+breaksEMA = (close > ema9 and open < ema9) or (close < ema9 and open > ema9)
+shortNegligibleWick = close - low <= math.abs(open - close) / 5
+longNegligibleWick = high - close <= math.abs(open - close) / 5
+
+longCondition = candleSize and breaksEMA and close > open and longNegligibleWick
+shortCondition = candleSize and breaksEMA and open > close and shortNegligibleWick
+
+var int longTradeBar = na
+var int shortTradeBar = na
+
+var float stopLossPrice = na
+var float takeProfitPrice = na
+
+// Strategy execution
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+    longTradeBar := bar_index
+    stopLossPrice := close - math.abs(open - close)
+    takeProfitPrice := close + math.abs(open - close) * 1.25
+    
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+    shortTradeBar := bar_index
+    stopLossPrice := close + math.abs(open - close)
+    takeProfitPrice := close - math.abs(open - close) * 1.25
+
+// Check if Stop Loss or Take Profit is hit within the bar
+if (strategy.position_size > 0)
+    if (low <= stopLossPrice or high >= takeProfitPrice or (not na(longTradeBar) and bar_index - longTradeBar == 2))
+        strategy.close("Long")
+        longTradeBar := na
+
+if (strategy.position_size < 0)
+    if (high >= stopLossPrice or low <= takeProfitPrice or (not na(shortTradeBar) and bar_index - shortTradeBar == 2))
+        strategy.close("Short")
+        shortTradeBar := na
+
+// Plotting
+plot(ema9, color=color.blue, title="9 EMA")
+
+// Tracking winning and losing trades
+winningTrades = strategy.wintrades
+losingTrades = strategy.losstrades
+
+// Display the win/loss count
+plot(winningTrades, title="Winning Trades", color=color.green)
+plot(losingTrades, title="Losing Trades", color=color.red)
+
+// Boolean variable to track if current bar is within the specified period
+var bool inPeriod = false
+
+// Update inPeriod on each bar
+inPeriod := time >= startTime and time <= endTime
+
+// Initialize a variable for period profit
+var float periodProfit = na
+
+// Calculate profit only within the specified period
+if (inPeriod)
+    periodProfit := strategy.netprofit
+
+// Plot the total return
+plot(periodProfit, title="Total Return %", color=color.blue)
