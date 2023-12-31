@@ -5,7 +5,7 @@ This is just a Big Bar Strategy with a simple logic and without much technical a
 -- On backtesting got a Strike rate of around 52%, but with stoploss trailing you can enlarge the RR ratio and thus maximize the profits.
 
 
-<img width="1440" alt="image" src="https://github.com/Anishde85/Big-Bar-Strategy/assets/59112660/585fc0ba-22ca-4ed7-8788-e49230c9ad3c">
+<img width="1440" alt="image" src="https://github.com/Anishde85/Big-Bar-Strategy/assets/59112660/491520c4-a9af-47e2-bcfe-3a1ef36f37ba">
 
 So, these were the results on last a time period of around 4 months of backtesting, trading with 2 lots (100 quantity) a profit of 43k was generated before brokerage which is quite a handsome profit trading with just 2 lots (use 5-6 ITM options for best results as they have high delta).
 
